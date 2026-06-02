@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Peserta - TOBK Utama</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="bg-gradient-to-tr from-slate-100 to-slate-200 min-h-screen flex items-center justify-center p-4 font-sans antialiased text-slate-800">
+
+    <div class="bg-white w-full max-w-md rounded-2xl shadow-xl border border-slate-200/60 p-6 md:p-8">
+        
+        <div class="text-center mb-8">
+            <div class="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-blue-600 text-white font-extrabold text-xl tracking-wider shadow-lg shadow-blue-100 mb-4">
+                TOBK
+            </div>
+            <h1 class="text-xl font-bold text-slate-800">Absolute Smart 101 Apps (c) 2026</h1>
+            <p class="text-sm text-slate-500 mt-1">Portal Ujian Mandiri Evaluasi Bab Fisika</p>
+        </div>
+
+        <form id="formLogin" onsubmit="prosesLogin(event)" class="space-y-5">
+            
+            <div>
+                <label for="inputNama" class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">Nama Lengkap Siswa</label>
+                <div class="relative">
+                    <input type="text" id="inputNama" required autocomplete="off" placeholder="Masukkan nama lengkap Anda" 
+                        class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium focus:outline-none focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-100 transition">
+                </div>
+            </div>
+
+            <div>
+                <label for="inputReg" class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">Nomor Registrasi / Password</label>
+                <div class="relative">
+                    <input type="password" id="inputReg" required placeholder="Masukkan kode registrasi" 
+                        class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium focus:outline-none focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-100 transition">
+                </div>
+                <p class="text-[11px] text-slate-400 mt-1.5">*Gunakan kode akses resmi dari pengawas ujian.</p>
+            </div>
+
+            <div>
+                <label for="selectBab" class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">Pilih Bab Materi Ujian</label>
+                <select id="selectBab" required 
+                    class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium focus:outline-none focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-100 transition cursor-pointer">
+                    <option value="" disabled selected>-- Pilih Materi Ujian --</option>
+                    <option value="soal_1.html">Ujian BAB 1: Hakikat Ilmu Fisika</option>
+                    <option value="soal_2.html">Ujian BAB 2: Pengukuran dan Besaran</option>
+                    <option value="soal_3.html">Ujian BAB 3: Vektor dan Kinematika</option>
+                    <option value="soal_4.html">Ujian BAB 4: Evaluasi Gambar Fisika</option>
+					<option value="soal_5.html">Ujian BAB 5: Fluida Statis Dinamis</option>
+				  
+                </select>
+            </div>
+
+            <div class="pt-2">
+                <button type="submit" 
+                    class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-xl text-sm transition shadow-lg shadow-blue-50 tracking-wide">
+                    Mulai Ujian Sekarang
+                </button>
+            </div>
+        </form>
+
+        <div class="text-center mt-8 pt-4 border-t border-slate-100">
+            <p class="text-xs text-slate-400">&copy; Absolute Smart 101 Apps (c) 2026.</p>
+        </div>
+
+    </div>
+
+    <script>
+        // Set kunci password statis
+        const KODE_REGISTRASI_BENAR = "Admin123";
+
+        function prosesLogin(event) {
+            // Mencegah halaman melakukan reload otomatis saat form disubmit
+            event.preventDefault(); 
+            
+            const namaSiswa = document.getElementById('inputNama').value.trim();
+            const passwordSiswa = document.getElementById('inputReg').value;
+            const targetHalamanUjian = document.getElementById('selectBab').value;
+
+            // 1. Validasi Password (Nomor Registrasi)
+            if (passwordSiswa !== KODE_REGISTRASI_BENAR) {
+                alert("❌ Nomor Registrasi atau Password salah! Akses ruang ujian ditolak.");
+                document.getElementById('inputReg').value = ""; // Kosongkan input password kembali
+                document.getElementById('inputReg').focus();    // Arahkan kursor kembali ke kolom
+                return;
+            }
+
+            // 2. Validasi Pilihan Bab Materi Ujian
+            if (!targetHalamanUjian) {
+                alert("⚠️ Silakan pilih bab materi ujian terlebih dahulu!");
+                return;
+            }
+
+            // 3. Jika Validasi Berhasil: Simpan identitas ke memori lokal browser
+            localStorage.setItem('namaSiswa', namaSiswa);
+            
+            // 4. Alihkan otomatis siswa ke file halaman ujian yang dipilih
+            window.location.href = targetHalamanUjian;
+        }
+
+        // Cek Keamanan: Jika ada sisa data ujian lama di perangkat, bersihkan saat memuat halaman login
+        window.onload = function() {
+            localStorage.removeItem('jawabanSiswa');
+        };
+    </script>
+</body>
+</html>

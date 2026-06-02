@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ruang Ujian - TOBK BAB 2</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="bg-slate-50 min-h-screen font-sans antialiased text-slate-800">
+
+    <header class="bg-white border-b border-slate-200 sticky top-0 z-50 px-6 py-4 flex flex-wrap justify-between items-center gap-4">
+        <div class="flex items-center gap-3">
+            <span class="bg-blue-600 text-white font-bold px-3 py-1.5 rounded-lg text-sm tracking-wider">TOBK</span>
+            <h2 class="font-semibold text-slate-700 border-l border-slate-200 pl-3">Ujian Utama: Pengukuran dan Besaran (10 Soal)</h2>
+        </div>
+        
+        <div class="flex items-center gap-6">
+            <div class="text-right hidden sm:block">
+                <p class="text-xs text-slate-400">Peserta Ujian</p>
+                <p id="displayName" class="text-sm font-semibold text-slate-700">-</p>
+            </div>
+            <div class="bg-amber-50 border border-amber-200 rounded-xl px-4 py-2 flex items-center gap-2">
+                <svg class="w-5 h-5 text-amber-600 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                <span id="countdown" class="font-mono font-bold text-amber-700 text-sm">02:00:00</span>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto p-4 md:p-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
+        
+        <div class="lg:col-span-2 space-y-6">
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 md:p-8">
+                <div class="flex justify-between items-center mb-6">
+                    <span id="textNomorSoal" class="bg-blue-50 text-blue-700 px-3 py-1 rounded-md text-xs font-bold uppercase tracking-wider">SOAL NOMOR 1</span>
+                    <span class="text-xs text-slate-400">Bobot: 10 Poin</span>
+                </div>
+
+                <div id="kontenSoal" class="text-base md:text-lg text-slate-800 leading-relaxed mb-8 font-medium"></div>
+                <div id="kontenPilihan" class="space-y-3"></div>
+            </div>
+
+            <div class="flex justify-between items-center">
+                <button id="btnPrev" onclick="pergiKeSoal(currentIdx - 1)" class="bg-white border border-slate-300 text-slate-600 px-5 py-2.5 rounded-xl text-sm font-medium hover:bg-slate-50 transition disabled:opacity-40 disabled:cursor-not-allowed">
+                    Sebelumnya
+                </button>
+                <button id="btnRagu" onclick="tandaiRaguRagu()" class="bg-amber-500 hover:bg-amber-600 text-white px-5 py-2.5 rounded-xl text-sm font-medium transition">
+                    Ragu-Ragu
+                </button>
+                <button id="btnNext" onclick="pergiKeSoal(currentIdx + 1)" class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-xl text-sm font-medium shadow-md shadow-blue-100 transition">
+                    Selanjutnya
+                </button>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 h-fit">
+            <h3 class="text-sm font-bold text-slate-700 mb-4 border-b border-slate-100 pb-3">Navigasi Soal</h3>
+            
+            <div id="gridNavigasi" class="grid grid-cols-5 gap-2"></div>
+
+            <div class="mt-6 pt-4 border-t border-slate-100 grid grid-cols-2 gap-2 text-xs text-slate-500">
+                <div class="flex items-center gap-2"><span class="w-3 h-3 rounded bg-blue-600 inline-block"></span> Pembuka</div>
+                <div class="flex items-center gap-2"><span class="w-3 h-3 rounded bg-emerald-500 inline-block"></span> Terjawab</div>
+                <div class="flex items-center gap-2"><span class="w-3 h-3 rounded bg-amber-500 inline-block"></span> Ragu-Ragu</div>
+                <div class="flex items-center gap-2"><span class="w-3 h-3 rounded bg-white border border-slate-200 inline-block"></span> Belum Diisi</div>
+            </div>
+
+            <div class="mt-6 border-t border-slate-100 pt-4">
+                <button onclick="finishExam()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-3 rounded-xl text-sm transition shadow-lg shadow-emerald-50">
+                    Selesai Ujian & Kumpulkan
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const dataUjian = [
+            { id: 1, tanya: "Di bawah ini yang termasuk ke dalam kelompok besaran pokok adalah...", opsi: ["A. Panjang, massa, dan tekanan", "B. Kecepatan, suhu, dan cahaya", "C. Kuat arus, intensitas cahaya, dan suhu", "D. Waktu, gaya, dan luas"] },
+            { id: 2, tanya: "Alat ukur berikut ini yang paling teliti untuk mengukur diameter dalam sebuah pipa kapiler kecil adalah...", opsi: ["A. Jangka Sorong", "B. Mikrometer Sekrup", "C. Penggaris Baja", "D. Meteran Pita"] },
+            { id: 3, tanya: "Dimensi dari besaran Gaya (F = m . a) dalam Sistem Internasional adalah...", opsi: ["A. [M][L][T]⁻¹", "B. [M][L][T]⁻²", "C. [M][L]²[T]⁻²", "D. [M][L]⁻¹[T]⁻²"] },
+            { id: 4, tanya: "Hasil pengukuran panjang sebuah benda adalah 0,04050 meter. Jumlah angka penting pada hasil pengukuran tersebut adalah...", opsi: ["A. 2 angka penting", "B. 3 angka penting", "C. 4 angka penting", "D. 5 angka penting"] },
+            { id: 5, tanya: "Besaran yang memiliki satuan Watt sekon (W.s) merupakan satuan dari besaran pokok atau turunan dari...", opsi: ["A. Daya listrik", "B. Energi", "C. Gaya", "D. Tekanan mekanis"] },
+            { id: 6, tanya: "Sebuah kubus memiliki sisi sepanjang 2,0 cm. Volume kubus tersebut jika dituliskan berdasarkan aturan angka penting adalah...", opsi: ["A. 8 cm³", "B. 8,0 cm³", "C. 8,00 cm³", "D. 8,000 cm³"] },
+            { id: 7, tanya: "Konversi satuan untuk nilai massa jenis air sebesar 1 g/cm³ jika diubah ke dalam satuan SI (kg/m³) adalah...", opsi: ["A. 10 kg/m³", "B. 100 kg/m³", "C. 1.000 kg/m³", "D. 10.000 kg/m³"] },
+            { id: 8, tanya: "Dimensi [M][L]⁻¹[T]⁻² menyatakan dimensi dari besaran turunan...", opsi: ["A. Usaha", "B. Daya", "C. Tekanan", "D. Momentum"] },
+            { id: 9, tanya: "Suhu tubuh seseorang menunjukkan angka 40°C. Jika diukur menggunakan termometer skala Fahrenheit, nilainya setara dengan...", opsi: ["A. 72°F", "B. 104°F", "C. 122°F", "D. 140°F"] },
+            { id: 10, tanya: "Di antara alat ukur massa berikut, yang bekerja berdasarkan prinsip keseimbangan momen gaya adalah...", opsi: ["A. Neraca O'hauss", "B. Neraca Digital", "C. Neraca Pegas", "D. Jembatan Timbang"] }
+        ];
+
+        let currentIdx = 0; 
+        let jawabanSiswa = new Array(dataUjian.length).fill(null); 
+        let statusRagu = new Array(dataUjian.length).fill(false);   
+
+        document.addEventListener("DOMContentLoaded", function() {
+            const namaSiswa = localStorage.getItem('namaSiswa');
+            if (!namaSiswa) { window.location.href = "index.html"; return; }
+            document.getElementById('displayName').innerText = namaSiswa;
+            renderSoal(); renderNavigasiPanel(); initCountdown(7200);
+        });
+
+        function renderSoal() {
+            const itemSoal = dataUjian[currentIdx];
+            document.getElementById('textNomorSoal').innerText = `SOAL NOMOR ${itemSoal.id}`;
+            document.getElementById('kontenSoal').innerText = itemSoal.tanya;
+
+            const kontenerPilihan = document.getElementById('kontenPilihan');
+            kontenerPilihan.innerHTML = ''; 
+
+            itemSoal.opsi.forEach((opsiTeks, idx) => {
+                const terpilih = jawabanSiswa[currentIdx] === idx;
+                const stylingCard = terpilih ? 'border-blue-500 bg-blue-50/40 text-blue-900 font-semibold ring-1 ring-blue-500' : 'border-slate-200 text-slate-700 hover:bg-slate-50/80';
+                kontenerPilihan.insertAdjacentHTML('beforeend', `<label onclick="simpanJawabanSiswa(${idx})" class="flex items-center gap-4 p-4 rounded-xl border ${stylingCard} cursor-pointer transition"><input type="radio" name="opsiUjian" ${terpilih ? 'checked' : ''} class="w-4 h-4 text-blue-600 font-medium"><span class="text-sm">${opsiTeks}</span></label>`);
+            });
+
+            document.getElementById('btnPrev').disabled = (currentIdx === 0);
+            const btnNext = document.getElementById('btnNext');
+            if (currentIdx === dataUjian.length - 1) {
+                btnNext.innerText = "Selesai"; btnNext.className = "bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2.5 rounded-xl text-sm font-medium shadow-md transition"; btnNext.onclick = finishExam;
+            } else {
+                btnNext.innerText = "Selanjutnya"; btnNext.className = "bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-xl text-sm font-medium shadow-md transition"; btnNext.onclick = () => pergiKeSoal(currentIdx + 1);
+            }
+        }
+
+        function simpanJawabanSiswa(idxOpsi) { jawabanSiswa[currentIdx] = idxOpsi; statusRagu[currentIdx] = false; renderSoal(); renderNavigasiPanel(); }
+        function tandaiRaguRagu() { if (jawabanSiswa[currentIdx] === null) { alert("Pilih opsi jawaban terlebih dahulu!"); return; } statusRagu[currentIdx] = !statusRagu[currentIdx]; renderSoal(); renderNavigasiPanel(); }
+        function pergiKeSoal(targetIdx) { if (targetIdx >= 0 && targetIdx < dataUjian.length) { currentIdx = targetIdx; renderSoal(); renderNavigasiPanel(); } }
+
+        function renderNavigasiPanel() {
+            const panelGrid = document.getElementById('gridNavigasi'); panelGrid.innerHTML = ''; 
+            dataUjian.forEach((soal, idx) => {
+                let statusStyle = "bg-white border-slate-200 text-slate-700"; 
+                if (jawabanSiswa[idx] !== null) statusStyle = "bg-emerald-500 text-white border-emerald-600"; 
+                if (statusRagu[idx]) statusStyle = "bg-amber-500 text-white border-amber-600"; 
+                if (idx === currentIdx) statusStyle = "bg-blue-600 text-white ring-4 ring-blue-100 border-blue-700 font-bold"; 
+                panelGrid.insertAdjacentHTML('beforeend', `<button onclick="pergiKeSoal(${idx})" class="w-full aspect-square rounded-xl text-xs font-semibold border ${statusStyle}">${soal.id}</button>`);
+            });
+        }
+
+        function initCountdown(totalDetik) {
+            let sisaWaktu = totalDetik; const elementTimer = document.getElementById('countdown');
+            const intervalTimer = setInterval(() => {
+                let jam = Math.floor(sisaWaktu / 3600); let menit = Math.floor((sisaWaktu % 3600) / 60); let detik = sisaWaktu % 60;
+                elementTimer.innerText = `${jam < 10 ? '0'+jam : jam}:${menit < 10 ? '0'+menit : menit}:${detik < 10 ? '0'+detik : detik}`;
+                if (sisaWaktu <= 0) { clearInterval(intervalTimer); finishExam(); } sisaWaktu--;
+            }, 1000);
+        }
+
+        function finishExam() {
+            if(confirm("Apakah Anda yakin ingin menyelesaikan lembar ujian BAB 2 ini?")) {
+                localStorage.setItem('jawabanSiswa', JSON.stringify(jawabanSiswa));
+                window.location.href = "output.html"; 
+            }
+        }
+    </script>
+</body>
+</html>
